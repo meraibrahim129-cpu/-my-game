@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحدي التغذية: حقيقة أم خرافة؟</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:20px;
+ font-family:Arial,sans-serif;
+ background:linear-gradient(135deg,#fff0d9,#d9f1df);
+ color:#344b3c;text-align:center
+}
+.container{
+ max-width:650px;margin:25px auto;background:white;
+ padding:25px 18px;border-radius:25px;
+ box-shadow:0 8px 25px #0002
+}
+h1{color:#38845a;font-size:29px}
+h2{color:#d17a36}
+p{font-size:19px;line-height:1.8}
+button{
+ border:0;border-radius:14px;padding:14px 22px;
+ margin:8px;font-size:18px;font-weight:bold;cursor:pointer
+}
+.start,.next{background:#55a879;color:white}
+.true{background:#70bd8a;color:white}
+.false{background:#ee967d;color:white}
+.timer{
+ font-size:25px;color:#d17a36;font-weight:bold;
+ background:#fff0d9;padding:12px;border-radius:15px
+}
+.progress{background:#eee;border-radius:20px;height:12px;margin:18px 0}
+.bar{background:#55a879;height:12px;border-radius:20px;width:0%}
+.feedback{padding:15px;border-radius:15px;background:#f1f8f1;margin:15px 0}
+.hidden{display:none}
+input{
+ width:130px;padding:12px;font-size:22px;
+ border:2px solid #70bd8a;border-radius:12px;text-align:center
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div id="welcome">
+<h1>🥗 تحدي التغذية: حقيقة أم خرافة؟ 🍔</h1>
+<p>استعدي للتصويت!</p>
+<p>ارفعي يدكِ اليمنى إذا كانت المعلومة <b>حقيقة</b>، ويدكِ اليسرى إذا كانت <b>خرافة</b>.</p>
+<p>⏱️ أمامكِ 30 ثانية للإجابة عن كل سؤال.</p>
+<button class="start" onclick="startGame()">ابدئي التحدي 🎮</button>
+</div>
+
+<div id="game" class="hidden">
+<div class="timer">⏳ الوقت: <span id="time">30</span> ثانية</div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<h2 id="number"></h2>
+<p id="question"></p>
+<div id="answers">
+<button class="true" onclick="answer(true)">حقيقة ✔️</button>
+<button class="false" onclick="answer(false)">خرافة ❌</button>
+</div>
+<div id="sugarInput" class="hidden">
+<p>اكتبي عدد الملاعق:</p>
+<input id="sugar" type="number" min="0" max="30">
+<button class="true" onclick="sugarAnswer()">تأكيد الإجابة</button>
+</div>
+<div id="feedback" class="feedback hidden"></div>
+<button id="next" class="next hidden" onclick="nextQuestion()">السؤال التالي ←</button>
+</div>
+
+<div id="result" class="hidden">
+<h1>🎉 انتهى التحدي!</h1>
+<h2 id="score"></h2>
+<p id="message"></p>
+<p>تخيلي أن تشربي كوب ماء مذاباً فيه 10 ملاعق سكر دفعة واحدة!</p>
+<p>اليوم سنتعلم كيف نختار غذاءً يمنحنا طاقة حقيقية دون خداع. 🥗</p>
+<button class="start" onclick="restart()">إعادة اللعب 🔄</button>
+</div>
+
+</div>
+
+<script>
+const questions=[
+{
+q:"تناول وجبة الفطور قبل المدرسة يزيد من سرعة استيعابكِ وذاكرتكِ في الحصص الأولى.",
+a:true,
+e:"الفطور يمد الجسم والدماغ بالطاقة، وقد يساعد على تحسين التركيز والانتباه خلال الحصص."
+},
+{
+q:"السكر البني صحي أكثر من السكر الأبيض ويحتوي على سعرات حرارية أقل بكثير.",
+a:false,
+e:"السكر البني والأبيض متشابهان جداً من الناحية الغذائية، والفرق بينهما بسيط."
+},
+{
+q:"شرب الماء بكثرة يذيب الدهون المتراكمة في الجسم مباشرة.",
+a:false,
+e:"الماء لا يذيب الدهون مباشرة، لكنه ضروري لترطيب الجسم والقيام بوظائفه."
+},
+{
+q:"أكل الفواكه بعد الساعة 8 مساءً يتحول تلقائياً إلى دهون لأن الجسم يتوقف عن الحرق.",
+a:false,
+e:"الجسم يستخدم الطاقة طوال اليوم وحتى أثناء النوم، وتناول الفاكهة ليلاً لا يحولها تلقائياً إلى دهون."
+},
+{
+q:"كم ملعقة صغيرة من السكر توجد تقريباً في علبة مشروب غازي واحدة (330 مل)؟",
+sugar:true,
+e:"قد تحتوي بعض المشروبات الغازية العادية بحجم 330 مل على نحو 9 إلى 10 ملاعق صغيرة من السكر، وقد تختلف الكمية حسب النوع."
+}
+];
+
+let index=0,points=0,time=30,clock=null,answered=false;
+
+function startGame(){
+ document.getElementById("welcome").classList.add("hidden");
+ document.getElementById("game").classList.remove("hidden");
+ showQuestion();
+}
+
+function showQuestion(){
+ answered=false;
+ time=30;
+ document.getElementById("time").textContent=time;
+ document.getElementById("number").textContent="السؤال "+(index+1)+" من "+questions.length;
+ document.getElementById("question").textContent=questions[index].q;
+ document.getElementById("feedback").classList.add("hidden");
+ document.getElementById("next").classList.add("hidden");
+ document.getElementById("answers").classList.toggle("hidden",!!questions[index].sugar);
+ document.getElementById("sugarInput").classList.toggle("hidden",!questions[index].sugar);
+ document.getElementById("sugar").value="";
+ document.getElementById("bar").style.width=(index/questions.length*100)+"%";
+ clearInterval(clock);
+ clock=setInterval(countdown,1000);
+}
+
+function countdown(){
+ time--;
+ document.getElementById("time").textContent=time;
+ if(time<=0){
+  clearInterval(clock);
+  if(!answered) showFeedback(false,true);
+ }
+}
+
+function answer(value){
+ if(answered)return;
+ showFeedback(value===questions[index].a,false);
+}
+
+function sugarAnswer(){
+ if(answered)return;
+ let value=Number(document.getElementById("sugar").value);
+ if(document.getElementById("sugar").value===""){
+  alert("اكتبي عدد الملاعق أولاً!");
+  return;
+ }
+ showFeedback(value>=9&&value<=10,false);
+}
+
+function showFeedback(correct,timeout){
+ answered=true;
+ clearInterval(clock);
+ if(correct&&!timeout)points++;
+ let box=document.getElementById("feedback");
+ box.classList.remove("hidden");
+ let title=timeout?"انتهى الوقت ⏰":correct?"إجابة صحيحة! 🎉":"إجابة غير صحيحة";
+ let answerText=questions[index].sugar?"الإجابة: من 9 إلى 10 ملاعق تقريباً.":"الإجابة الصحيحة: "+(questions[index].a?"حقيقة":"خرافة");
+ box.innerHTML="<h2>"+title+"</h2><p>"+answerText+"</p><p>"+questions[index].e+"</p>";
+ document.getElementById("answers").classList.add("hidden");
+ document.getElementById("sugarInput").classList.add("hidden");
+ document.getElementById("next").classList.remove("hidden");
+ document.getElementById("next").textContent=index===questions.length-1?"عرض النتيجة 🏆":"السؤال التالي ←";
+}
+
+function nextQuestion(){
+ index++;
+ if(index<questions.length){
+  showQuestion();
+ }else{
+  finish();
+ }
+}
+
+function finish(){
+ document.getElementById("game").classList.add("hidden");
+ document.getElementById("result").classList.remove("hidden");
+ document.getElementById("score").textContent="نتيجتك: "+points+" من "+questions.length;
+ document.getElementById("message").textContent=
+ points===5?"ممتاز! خبيرة التغذية اليوم! 🌟":
+ points>=3?"أحسنتِ! معلوماتكِ جيدة، واصلي التعلم! 🌸":
+ "محاولة جميلة! تعلمنا معلومات جديدة اليوم! 💚";
+}
+
+function restart(){
+ index=0;
+ points=0;
+ clearInterval(clock);
+ document.getElementById("result").classList.add("hidden");
+ document.getElementById("welcome").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
