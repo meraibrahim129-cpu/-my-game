@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رد الثأر والانتقام</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+*{box-sizing:border-box}
+body{margin:0;background:#100e12;color:white;font-family:Cairo,sans-serif}
+header{text-align:center;padding:25px;background:linear-gradient(135deg,#190e14,#451b27);border-bottom:2px solid #a64c5c}
+h1{color:#e8b0b5}
+.container{max-width:800px;margin:auto;padding:15px}
+.card{background:#211c23;border:1px solid #49343e;border-radius:15px;padding:18px;margin:15px 0}
+h2{color:#e8b0b5}
+button{font-family:inherit;background:#963e50;color:white;border:0;padding:11px 16px;margin:5px;border-radius:9px;font-weight:bold;cursor:pointer}
+button:hover{background:#c05b70}
+.hidden{display:none}
+.clue{background:#302630;padding:12px;border-right:3px solid #d0a16b;border-radius:8px;margin:10px 0;line-height:2}
+.person{padding:10px;margin:8px 0;background:#302630;border-radius:8px;border-right:3px solid #a64c5c}
+.small{color:#aaa;font-size:13px}
+#score{color:#e9c17b}
+footer{text-align:center;color:#888;padding:20px}
+</style>
+</head>
+<body>
+
+<header>
+<div style="font-size:45px">🕵️‍♀️</div>
+<h1>رد الثأر والانتقام</h1>
+<p>V WAR | ملف القضية السرية</p>
+</header>
+
+<div class="container">
+
+<section id="home" class="card">
+<h2>📁 القضية رقم 047</h2>
+
+<div style="text-align:center">
+<img id="osama"
+src="https://unavatar.io/twitter/osvwar"
+alt="أسامة صالح - في وار"
+style="width:190px;height:190px;object-fit:cover;border-radius:15px;border:3px solid #a64c5c"
+onerror="this.onerror=null;this.src='https://pbs.twimg.com/profile_images/1902416046805372928/3pIBkVNH.jpg';">
+<p class="small">أسامة صالح | V WAR</p>
+</div>
+
+<p style="line-height:2">
+منذ سنوات وقعت أحداث غامضة جمعت ستة أشخاص.
+ظن الجميع أن الماضي انتهى، لكن رسالة مجهولة أعادت فتح الملفات القديمة.
+
+وفي ليلة غامضة، وقعت جريمة هزّت الجميع.
+
+مهمتك اكتشاف الحقيقة، وفهم أسرار الشخصيات، والوصول إلى الجاني.
+</p>
+
+<button onclick="start()">ابدئي التحقيق 🔎</button>
+</section>
+
+<section id="game" class="hidden">
+
+<div class="card">
+<h2>📊 لوحة المحققة</h2>
+النقاط: <span id="score">0</span> ⭐
+<br>الأدلة: <span id="count">0</span> / 6
+</div>
+
+<div class="card">
+<h2>👥 المشتبه بهم</h2>
+<div class="person">سعود: شخصية غامضة من الماضي.</div>
+<div class="person">تركي: يعرف أسراراً لم يكشفها.</div>
+<div class="person">متعب: لديه معلومات عن ليلة الحادثة.</div>
+<div class="person">سلمان: يحتفظ بملف قديم.</div>
+<div class="person">فرج: يعرف أسرار المكان.</div>
+<div class="person">ذيب: لا يمكن الوثوق بأقواله بسهولة.</div>
+</div>
+
+<div class="card">
+<h2>🗣️ الاستجواب</h2>
+<p>اختاري شخصاً لسماع أقواله:</p>
+<div id="buttons"></div>
+<div id="dialogue" class="clue">لم يبدأ الاستجواب بعد.</div>
+</div>
+
+<div class="card">
+<h2>🔍 اكتشاف الأدلة</h2>
+<p>افحصي الأماكن التالية:</p>
+<div id="places"></div>
+<div id="evidence"></div>
+</div>
+
+<div class="card">
+<h2>📓 دفتر المحققة</h2>
+<div id="notebook">لا توجد أدلة بعد.</div>
+</div>
+
+<div class="card">
+<h2>⚖️ المواجهة الأخيرة</h2>
+<p>من تتهمين؟</p>
+<div id="accusations"></div>
+<p id="feedback"></p>
+</div>
+
+</section>
+
+<section id="ending" class="card hidden">
+<h2>📂 نهاية التحقيق</h2>
+<div id="result"></div>
+<h2>⭐ نقاطك: <span id="finalScore"></span></h2>
+<button onclick="location.reload()">إعادة القضية 🔄</button>
+</section>
+
+</div>
+<footer>V WAR | ملف التحقيقات السرية</footer>
+
+<script>
+let score=0;
+let found=[];
+let interviewed=[];
+
+const names=["سعود","تركي","متعب","سلمان","فرج","ذيب"];
+
+const statements={
+"سعود":"الماضي لا يمكن تغييره، لكن هناك أشياء لم تعرفوها حتى الآن.",
+"تركي":"كنت بعيداً عن المكان، لكنني سمعت أن رسالة وصلت قبل الحادثة.",
+"متعب":"لا أريد الحديث عن تلك الليلة قبل أن أعرف ماذا وجدتم.",
+"سلمان":"هناك ملف قديم قد يغير كل شيء في هذه القضية.",
+"فرج":"أنا أعرف المكان جيداً، لكنني لا أعرف من فعل ذلك.",
+"ذيب":"أنتم تبحثون عن الجواب الخطأ. اسألوا أنفسكم: لماذا حدث كل هذا؟"
+};
+
+const clues=[
+["📱 الهاتف","هاتف قديم يحتوي على رسالة غير مكتملة: لا تثق بالشخص الذي..."],
+["📜 الرسالة","رسالة مجهولة تحمل تاريخاً قديماً وعبارة: الحساب لم ينتهِ."],
+["🕰️ الساعة","الساعة متوقفة، لكن لا يوجد دليل أن وقت توقفها هو وقت الحادثة."],
+["🚪 المدخل","سجل الدخول يحتوي على أسماء الأشخاص الستة، لكن تسجيلاً واحداً مفقود."],
+["📁 الملف القديم","ملف قديم يثبت وجود حدث سابق جمع الشخصيات الست."],
+["🔑 المفتاح","مفتاح مجهول لا يتطابق مع أي باب ظاهر في المكان."]
+];
+
+function start(){
+document.getElementById("home").classList.add("hidden");
+document.getElementById("game").classList.remove("hidden");
+
+names.forEach(n=>{
+let b=document.createElement("button");
+b.textContent=n;
+b.onclick=()=>talk(n);
+document.getElementById("buttons").appendChild(b);
+
+let a=document.createElement("button");
+a.textContent=n;
+a.onclick=()=>accuse(n);
+document.getElementById("accusations").appendChild(a);
+});
+
+["📱 الهاتف","📜 الرسالة","🕰️ الساعة","🚪 المدخل","📁 الملف القديم","🔑 المفتاح"].forEach((n,i)=>{
+let b=document.createElement("button");
+b.textContent=n;
+b.onclick=()=>search(i);
+document.getElementById("places").appendChild(b);
+});
+}
+
+function update(){
+document.getElementById("score").textContent=score;
+document.getElementById("count").textContent=found.length;
+}
+
+function talk(n){
+document.getElementById("dialogue").innerHTML=
+"<b>استجواب "+n+"</b><br>"+statements[n];
+if(!interviewed.includes(n)){
+interviewed.push(n);
+score+=5;
+update();
+}
+}
+
+function search(i){
+if(found.includes(i)){
+document.getElementById("feedback").textContent="هذا الدليل اكتشفتيه سابقاً!";
+return;
+}
+found.push(i);
+score+=15;
+update();
+
+let d=document.createElement("div");
+d.className="clue";
+d.innerHTML="<b>"+clues[i][0]+"</b><br>"+clues[i][1];
+document.getElementById("evidence").appendChild(d);
+
+document.getElementById("notebook").innerHTML=
+found.map(i=>"<p>✔ "+clues[i][0]+"</p>").join("");
+}
+
+function accuse(n){
+if(found.length<3 || interviewed.length<3){
+document.getElementById("feedback").textContent=
+"اجمعي 3 أدلة واستجوبي 3 أشخاص أولاً!";
+return;
+}
+
+document.getElementById("game").classList.add("hidden");
+document.getElementById("ending").classList.remove("hidden");
+
+document.getElementById("result").innerHTML=
+"<h3>اخترتِ اتهام: "+n+"</h3>"+
+"<p>انتهى التحقيق الأولي، لكن الملف يحتوي على أسرار لم تُكشف بعد.</p>"+
+"<p>هذه نسخة تجريبية، ولم يتم تحديد الجاني الحقيقي فيها.</p>";
+
+document.getElementById("finalScore").textContent=score;
+}
+</script>
+</body>
+  </html>
+  
