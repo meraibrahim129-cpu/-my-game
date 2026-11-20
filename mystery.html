@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ملف القضية 001</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:'Cairo',sans-serif;
+ background:linear-gradient(135deg,#10101d,#20213a,#171326);
+ color:#fff;
+ min-height:100vh;
+}
+header{
+ text-align:center;padding:25px 12px;
+ background:#11111dcc;border-bottom:2px solid #c5a35b;
+}
+header h1{color:#e9c879;margin:0;font-size:27px}
+header p{color:#aaa;margin:5px}
+.container{max-width:850px;margin:auto;padding:18px}
+.card{
+ background:#24243a;border:1px solid #44435b;
+ border-radius:17px;padding:18px;margin:15px 0;
+ box-shadow:0 5px 20px #0005;
+}
+h2{color:#e9c879;margin-top:0}
+button{
+ font-family:inherit;border:0;border-radius:10px;
+ padding:11px 17px;margin:5px;cursor:pointer;
+ background:#c5a35b;color:#171326;font-weight:bold;
+ font-size:15px;transition:.2s;
+}
+button:hover{transform:scale(1.04);background:#f0d58d}
+.secondary{background:#41415d;color:white}
+.danger{background:#a94455;color:white}
+.hidden{display:none}
+.character{
+ display:inline-block;background:#34344d;
+ border-radius:12px;padding:12px;margin:6px;
+ min-width:125px;text-align:center;
+}
+.character span{font-size:35px;display:block}
+.clue{border-right:4px solid #c5a35b;padding:10px;margin:10px 0;background:#303047;border-radius:8px}
+#message{color:#e9c879;font-weight:bold;min-height:25px}
+#score{color:#e9c879;font-weight:bold}
+#story{line-height:2}
+input{
+ font-family:inherit;padding:12px;border-radius:9px;
+ border:1px solid #aaa;background:#eee;width:100%;margin:8px 0;
+}
+footer{text-align:center;padding:20px;color:#888}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🕵️ ملف القضية 001</h1>
+<p>سر الألماسة المفقودة | قسم التحقيقات السرية</p>
+</header>
+
+<div class="container">
+
+<section id="start" class="card">
+<h2>📁 القضية: سر القصر المظلم</h2>
+<div id="story">
+في ليلة شتوية، أقام السيد أدهم حفلاً كبيراً في قصره.
+وكانت أهم قطعة في القصر هي ألماسة نادرة تُسمى
+«نجمة الليل».
+
+في الساعة 10:00 مساءً، انطفأت الأنوار لبضع دقائق.
+وعندما عادت، اكتشف الجميع أن الألماسة اختفت!
+
+كان في القصر أربعة أشخاص فقط بالقرب من غرفة العرض.
+
+تم تعيينك محققة خاصة لحل القضية.
+
+هل أنت مستعدة لكشف الحقيقة؟
+</div>
+<br>
+<button onclick="begin()">ابدئي التحقيق 🔎</button>
+</section>
+
+<section id="game" class="hidden">
+
+<div class="card">
+<h2>📊 لوحة التحقيق</h2>
+<p>النقاط: <span id="score">0</span> ⭐</p>
+<p>الأدلة المكتشفة: <span id="count">0</span> / 4</p>
+</div>
+
+<div class="card">
+<h2>👥 المشتبه بهم</h2>
+<div class="character"><span>👨🏻</span><b>سامر</b><br>حارس القصر</div>
+<div class="character"><span>👩🏻</span><b>ليان</b><br>مساعدة صاحب القصر</div>
+<div class="character"><span>🧔🏻</span><b>مازن</b><br>صديق أدهم</div>
+<div class="character"><span>👩🏼</span><b>نور</b><br>مصورة الحفل</div>
+</div>
+
+<div class="card">
+<h2>🗣️ استجواب المشتبه بهم</h2>
+<p>اختاري شخصاً لمعرفة أقواله:</p>
+<button onclick="interrogate('samer')">سامر</button>
+<button onclick="interrogate('layan')">ليان</button>
+<button onclick="interrogate('mazen')">مازن</button>
+<button onclick="interrogate('nour')">نور</button>
+<div id="dialogue" class="clue">لم تستجوبي أحداً بعد.</div>
+</div>
+
+<div class="card">
+<h2>🔍 غرفة الأدلة</h2>
+<p>ابحثي في أماكن القصر واكتشفي الأدلة.</p>
+<button onclick="findClue(0)">🪟 النافذة</button>
+<button onclick="findClue(1)">📷 الكاميرات</button>
+<button onclick="findClue(2)">📝 مكتب أدهم</button>
+<button onclick="findClue(3)">🧤 غرفة الحارس</button>
+<div id="clues"></div>
+</div>
+
+<div class="card">
+<h2>🧠 دفتر المحققة</h2>
+<p>ما الذي توصلتِ إليه حتى الآن؟</p>
+<div id="notebook">الأدلة ستظهر هنا بعد اكتشافها.</div>
+</div>
+
+<div class="card">
+<h2>⚖️ لحظة اتخاذ القرار</h2>
+<p>من تعتقدين أنه أخذ الألماسة؟</p>
+<button onclick="accuse('samer')">سامر</button>
+<button onclick="accuse('layan')">ليان</button>
+<button onclick="accuse('mazen')">مازن</button>
+<button onclick="accuse('nour')">نور</button>
+<p id="message"></p>
+</div>
+
+</section>
+
+<section id="ending" class="card hidden">
+<h2>🏆 انتهت القضية!</h2>
+<div id="endingText"></div>
+<h2>⭐ نتيجتك: <span id="finalScore"></span></h2>
+<button onclick="location.reload()">🔄 ابدئي قضية جديدة</button>
+</section>
+
+</div>
+
+<footer>ملفات التحقيق السرية © 2026</footer>
+
+<script>
+let score=0;
+let found=[];
+let interviewed=[];
+
+const clues=[
+{
+title:"🪟 الدليل الأول: النافذة",
+text:"لاحظتِ أن النافذة مغلقة من الداخل، ولا توجد أي آثار دخول من الخارج. يبدو أن من أخذ الألماسة كان داخل القصر."
+},
+{
+title:"📷 الدليل الثاني: الكاميرات",
+text:"تُظهر تسجيلات الكاميرا أن نور كانت في الحديقة وقت اختفاء الألماسة، بينما ظهرت ليان قرب غرفة العرض قبل انطفاء الأنوار."
+},
+{
+title:"📝 الدليل الثالث: مكتب أدهم",
+text:"وجدتِ ورقة مكتوباً عليها: (يجب نقل الألماسة قبل منتصف الليل). يبدو أن صاحب القصر كان يخطط لنقلها!"
+},
+{
+title:"🧤 الدليل الرابع: غرفة الحارس",
+text:"وجدتِ بطاقة دخول احتياطية في غرفة الحارس، لكن سجل الكاميرات يؤكد أن البطاقة استُخدمت قبل الحفل بدقائق."
+}
+];
+
+const people={
+samer:{
+name:"سامر، حارس القصر",
+text:"كنت عند المدخل وقت انطفاء الأنوار. لم أغادر مكاني أبداً. أنا مسؤول عن حماية القصر!"
+},
+layan:{
+name:"ليان، مساعدة أدهم",
+text:"كنت أجهز قائمة الضيوف. صحيح أنني مررت قرب غرفة العرض، لكنني لم أدخلها. وأعرف أن السيد أدهم كان يريد نقل الألماسة!"
+},
+mazen:{
+name:"مازن، صديق أدهم",
+text:"كنت في الصالة مع الضيوف. لم أكن مهتماً بالألماسة أصلاً. لكنني رأيت شخصاً يحمل حقيبة صغيرة قرب الممر."
+},
+nour:{
+name:"نور، مصورة الحفل",
+text:"كنت أصور الحديقة وقت انقطاع الكهرباء. لدي صور تثبت ذلك، ويمكنكم مراجعة الكاميرات."
+}
+};
+
+function sound(freq=500){
+try{
+let ctx=new(window.AudioContext||window.webkitAudioContext)();
+let osc=ctx.createOscillator();
+let gain=ctx.createGain();
+osc.connect(gain);gain.connect(ctx.destination);
+osc.frequency.value=freq;
+gain.gain.value=.07;
+osc.start();
+osc.stop(ctx.currentTime+.15);
+}catch(e){}
+}
+
+function begin(){
+sound();
+document.getElementById('start').classList.add('hidden');
+document.getElementById('game').classList.remove('hidden');
+}
+
+function update(){
+document.getElementById('score').textContent=score;
+document.getElementById('count').textContent=found.length;
+}
+
+function interrogate(id){
+sound(450);
+let p=people[id];
+document.getElementById('dialogue').innerHTML=
+"<b>"+p.name+"</b><br>"+p.text;
+if(!interviewed.includes(id)){
+ interviewed.push(id);
+ score+=5;
+ update();
+}
+}
+
+function findClue(i){
+sound(600);
+if(found.includes(i)){
+ document.getElementById('message').textContent="لقد اكتشفتِ هذا الدليل سابقاً!";
+ return;
+}
+found.push(i);
+score+=15;
+update();
+
+let c=clues[i];
+let item=document.createElement('div');
+item.className='clue';
+item.innerHTML="<b>"+c.title+"</b><br>"+c.text;
+document.getElementById('clues').appendChild(item);
+
+document.getElementById('notebook').innerHTML=
+found.map(n=>"<p>✔ "+clues[n].title+"</p>").join("");
+}
+
+function accuse(id){
+sound(350);
+if(found.length<2){
+document.getElementById('message').textContent=
+"🔎 اجمعي دليلين على الأقل قبل توجيه الاتهام!";
+return;
+}
+
+document.getElementById('game').classList.add('hidden');
+document.getElementById('ending').classList.remove('hidden');
+
+let result=document.getElementById('endingText');
+
+if(id==='layan'){
+score+=30;
+result.innerHTML=
+"<h3>🎉 أحسنتِ! لقد حللتِ القضية!</h3>"+
+"ليان هي التي أخذت الألماسة!<br><br>"+
+"اكتشفتِ أنها استخدمت بطاقة الدخول الاحتياطية، "+
+"واستغلت انطفاء الأنوار لإخفاء الألماسة داخل حقيبتها.<br><br>"+
+"لكن المفاجأة أن أدهم كان يعرف أنها ستفعل ذلك، "+
+"وكان يخطط لاختبار أمن القصر!";
+sound(800);
+}else{
+result.innerHTML=
+"<h3>❌ اتهام غير صحيح!</h3>"+
+"المتهمة الحقيقية هي ليان، مساعدة أدهم.<br><br>"+
+"راجعي الأدلة مرة أخرى وحاولي اكتشاف الرابط بينها!";
+}
+
+document.getElementById('finalScore').textContent=score;
+}
+</script>
+</body>
+                                                  </html>
+                                                  
